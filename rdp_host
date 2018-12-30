@@ -1,0 +1,11 @@
+#!/bin/bash
+
+if [ $# == 0 ]; then
+echo "Usage: rdp_host server-hostname"
+exit 1
+fi
+
+echo "Enter the password for the Administrator user"
+read -r password
+
+/usr/bin/rdesktop -g 1280x1024 -u 'administrator' -p "$password" -5 -K -r clipboard:CLIPBOARD $1 2>> /dev/null &

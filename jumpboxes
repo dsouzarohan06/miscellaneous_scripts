@@ -1,0 +1,42 @@
+#!/bin/bash
+
+passwd="<Enter password here>"
+# You can add the encrypted password here using: `echo "password" | openssl enc -base64 -e` and then use -d flag to decrypt the encrypted text
+# Eg. passwd=`echo "asfadsgfsdg" | openssl enc -base64 -d`
+
+ping $1 -c 1 -q >> /dev/null 2>&1
+
+if [ "$?" -ne "0" ]; then
+echo "Jumpbox not reachable. Check connectivity !!"
+exit 2
+fi
+
+if [ "$1" == dadar ]; then
+# This jumpbox uses Google Auth, hence the Verification code is asked before the password
+key=$(oathtool --totp <AUTH_STRING> --base32)
+/usr/bin/expect -c "
+set timeout 2
+spawn ssh $1
+expect *?actor*
+send -- $key\r
+expect *?actor*
+send -- $passwd\r
+interact
+"
+elif [ "$1" == "jumpbox01" ] || [ "$1" == "jumpbox02" ]; then
+# These jumpboxes use FreeIPA, hence the password is asked before the Verification code
+key=$(oathtool --totp <AUTH_STRING> --base32)
+/usr/bin/expect -c "
+set timeout 3
+spawn ssh $1
+expect *?actor*
+send -- $passwd\r
+expect *?actor*
+send -- $key\r
+interact
+"
+fi
+
+if [ "$1"==0 ]; then
+set  "jumpbox01"
+fi

@@ -1,0 +1,13 @@
+#!/bin/bash 
+
+read -p "Which VPN server would you like to connect to: 1 or 2 ? `echo $'\n> '`" response
+
+if [ $response == 1 ]
+then
+openvpn --config /etc/openvpn/vpn-01.ovpn >> /dev/null
+elif [ $response == 2 ]
+then
+openvpn --config /etc/openvpn/vpn-02.ovpn >> /dev/null
+else
+echo  "Invalid Input"
+fi
